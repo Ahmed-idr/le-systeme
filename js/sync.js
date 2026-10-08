@@ -37,7 +37,7 @@ async function getClient() {
   if (!window.supabase) {
     await new Promise((res, rej) => {
       const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.min.js';
       s.onload = res; s.onerror = () => rej(new Error('Impossible de charger Supabase (hors ligne ?)'));
       document.head.appendChild(s);
     });
