@@ -552,3 +552,9 @@ select option { background: var(--surface-2); }
 .deload-card { border-color: rgba(52, 211, 153, 0.3); background: linear-gradient(180deg, var(--good-soft), transparent 70%), var(--surface); }
 .deload-card .card-head { color: var(--good); margin-bottom: 6px; }
 .deload-card .card-head h2 { color: var(--text); }
+.auth-msg { margin-top: 12px; padding: 12px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.45; background: var(--surface-2); }
+.auth-msg[hidden] { display: none; }
+.auth-msg.err { background: var(--bad-soft); color: #fecaca; }
+.auth-msg.warn { background: var(--gold-soft); color: #fde68a; }
+.auth-msg.info { color: var(--muted); }
+.btn:disabled { opacity: 0.5; pointer-events: none; }

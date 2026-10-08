@@ -926,8 +926,10 @@ function sheetSync() {
   const statusTxt = { off: 'Non connecté', idle: 'Synchronisé', syncing: 'Synchronisation…', error: 'Erreur de synchro', offline: 'Hors ligne : synchro au retour du réseau' }[status];
   openSheet('Synchronisation', `
     <div class="sync-state s-${status}">${ic('cloud')}<span><b>${statusTxt}</b>${user ? `<br><small>${esc(user.email)}</small>` : ''}</span></div>
+    ${sync.lastError && status !== 'idle' && status !== 'syncing' ? `<div class="auth-msg err">${esc(sync.lastError)}</div>` : ''}
     ${user ? `<div class="stack mt"><button class="btn secondary block" data-action="sync-now">${ic('sync')}Synchroniser maintenant</button><button class="btn ghost block" data-action="sync-out">Se déconnecter</button></div>`
     : cfg ? `
+      <div class="auth-msg" hidden></div>
       <form class="form mt" data-form="auth">
         <label>Email<input type="email" name="email" autocomplete="email" required></label>
         <label>Mot de passe<input type="password" name="password" autocomplete="current-password" minlength="6" required></label>
@@ -1180,13 +1182,25 @@ document.addEventListener('submit', async (e) => {
     sheetSync();
   } else if (kind === 'auth') {
     const mode = e.submitter?.value || 'in';
+    const box = $('#sheet .auth-msg');
+    const show = (msg, kind) => { if (box) { box.className = 'auth-msg ' + kind; box.innerHTML = msg; box.hidden = false; } };
+    f.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    show('Connexion…', 'info');
     try {
       if (mode === 'up') {
-        const r = await sync.signUp(fd.email, fd.password);
-        toast(r.session ? 'Compte créé, synchro activée' : 'Compte créé : confirme ton email puis connecte-toi');
-      } else { await sync.signIn(fd.email, fd.password); toast(ic('check') + ' Connecté'); }
+        const r = await sync.signUp(fd.email.trim(), fd.password);
+        if (r.needsConfirm) {
+          show('Compte créé, mais Supabase demande de <b>confirmer ton email</b>. Ouvre l’email reçu et clique sur le lien, puis reviens cliquer sur « Se connecter ». Pour éviter ça : Supabase → Authentication → Sign In / Providers → Email → décoche « Confirm email ».', 'warn');
+          f.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+          return;
+        }
+        toast(ic('check') + ' Compte créé, synchro activée');
+      } else { await sync.signIn(fd.email.trim(), fd.password); toast(ic('check') + ' Connecté, synchro activée'); }
       sheetSync();
-    } catch (err) { toast('Erreur : ' + esc(err.message || err), 'err'); }
+    } catch (err) {
+      show(esc(sync.explainError(err)), 'err');
+      f.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+    }
   }
 });
 

@@ -1,6 +1,6 @@
 // Service worker : l'app marche hors ligne (à la salle sans réseau, par ex.).
 // Pense à changer VERSION à chaque mise en ligne d'une nouvelle version.
-const VERSION = 'sl-v4';
+const VERSION = 'sl-v5';
 const SHELL = [
   './', './index.html', './styles.css', './config.js', './manifest.webmanifest',
   './js/app.js', './js/store.js', './js/program.js', './js/charts.js', './js/sync.js',
